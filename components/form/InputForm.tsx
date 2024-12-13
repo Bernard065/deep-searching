@@ -1,21 +1,41 @@
 "use client";
 
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react"; // Add icon from Lucide or use Heroicons
+import { Edit, Trash2 } from "lucide-react";
 
 const InputForm = () => {
-  const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [task, setTask] = useState(""); // State to store the current value of the task input
+  const [tasks, setTasks] = useState<string[]>([]); // State to store an array of added tasks
+  const [isEditing, setIsEditing] = useState<number | null>(null);
 
-  // Event handler for form submission
   const addTask = () => {
+    // If the task is an empty string (after removing whitespace), exit the function
     if (task.trim() === "") return;
+    // Add the new task to the existing array of tasks using the spread operator
+    // prevTasks refer to the previous tasks array
     setTasks((prevTasks) => [...prevTasks, task]);
+    // Clear the input field after adding the task.
     setTask("");
   };
 
+  const editTask = (index: number) => {
+    setIsEditing(index);
+    setTask(tasks[index]);
+  };
+
+  const saveTask = () => {
+    if (task.trim() === "" || isEditing === null) return;
+    const updatedTasks = tasks.map((t, i) => (i === isEditing ? task : t));
+    setTasks(updatedTasks);
+    setTask("");
+    setIsEditing(null);
+  };
+
+  // Filter out the task at the specified index, keeping all other tasks.
+  //The underscore (_) indicates that the first argument of filter (the task) is unused.
   const removeTask = (index: number) => {
     const updatedTasks = tasks.filter((_, i) => i !== index);
+    // Update the state with the new array of tasks.
     setTasks(updatedTasks);
   };
 
@@ -29,15 +49,24 @@ const InputForm = () => {
           type="text"
           value={task}
           onChange={(e) => setTask(e.target.value)}
-          placeholder="Add a new task..."
+          placeholder={isEditing !== null ? "Edit task" : "Add task"}
           className="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
-          onClick={addTask}
-          className="bg-yellow-500 hover:bg-yellow-400 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105"
-        >
-          Add
-        </button>
+        {isEditing !== null ? (
+          <button
+            onClick={saveTask}
+            className="bg-green-500 hover:bg-green-400 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105"
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            onClick={addTask}
+            className="bg-yellow-500 hover:bg-yellow-400 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-all transform hover:scale-105"
+          >
+            Add
+          </button>
+        )}
       </div>
 
       {/* Display existing tasks */}
@@ -57,13 +86,23 @@ const InputForm = () => {
                   {task}
                 </span>
 
-                <button
-                  onClick={() => removeTask(index)}
-                  className="text-red-500 hover:text-red-700 transition-all flex items-center justify-center"
-                  aria-label="Delete task"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => editTask(index)}
+                    className="text-blue-500 hover:text-blue-700 transition-all flex items-center justify-center"
+                    aria-label="Edit task"
+                  >
+                    <Edit />
+                  </button>
+
+                  <button
+                    onClick={() => removeTask(index)}
+                    className="text-red-500 hover:text-red-700 transition-all flex items-center justify-center"
+                    aria-label="Delete task"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
