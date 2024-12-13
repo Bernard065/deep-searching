@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Edit, Trash2 } from "lucide-react";
+import SearchForm from "@/components/search/SearchForm";
 
 const InputForm = () => {
   const [task, setTask] = useState(""); // State to store the current value of the task input
@@ -41,7 +42,7 @@ const InputForm = () => {
 
   return (
     <div className="flex flex-col items-center gap-8 p-6 bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen w-full">
-      <p>Search</p>
+      <SearchForm />
       <h1 className="text-4xl font-bold text-white">My To-Do List</h1>
 
       <div className="flex items-center w-full max-w-md gap-4">
